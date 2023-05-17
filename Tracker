@@ -1,0 +1,36 @@
+import datetime
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+
+def get_location():
+    geolocator = Nominatim(user_agent="daily_movement_tracker")
+    location = geolocator.geocode(input("Enter your current location: "))
+    return (location.latitude, location.longitude)
+
+def calculate_distance(start, end):
+    return geodesic(start, end).miles
+
+def save_movement(start, end, distance):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open("movement_log.txt", "a") as file:
+        file.write(f"{timestamp}: Start: {start}, End: {end}, Distance: {distance} miles\n")
+
+def main():
+    print("Daily Movement Tracker")
+    start_location = get_location()
+    print(f"Start location: {start_location}")
+    while True:
+        input("Press enter when you're ready to stop tracking.")
+        end_location = get_location()
+        print(f"End location: {end_location}")
+        distance = calculate_distance(start_location, end_location)
+        print(f"Distance traveled: {distance} miles")
+        save_movement(start_location, end_location, distance)
+        start_location = end_location
+        print("Movement saved.\n")
+        choice = input("Do you want to continue tracking? (y/n): ")
+        if choice.lower() != "y":
+            break
+
+if __name__ == "__main__":
+    main()
